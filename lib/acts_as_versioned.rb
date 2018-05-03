@@ -205,7 +205,7 @@ module ActiveRecord #:nodoc:
         #
         # Create the dynamic versioned model
         #
-        const_set(versioned_class_name, Class.new(ActiveRecord::Base)).class_eval do
+        const_set(versioned_class_name, Class.new(defined?(ApplicationRecord) ? ApplicationRecord : ActiveRecord::Base)).class_eval do
           def self.reloadable?;
             false;
           end
@@ -286,7 +286,7 @@ module ActiveRecord #:nodoc:
           return if self.class.max_version_limit == 0
           excess_baggage = send(self.class.version_column).to_i - self.class.max_version_limit
           if excess_baggage > 0
-            self.class.versioned_class.delete_all ["#{self.class.version_column} <= ? and #{self.class.versioned_foreign_key} = ?", excess_baggage, id]
+            self.class.versioned_class.where("#{self.class.version_column} <= ? and #{self.class.versioned_foreign_key} = ?", excess_baggage, id).delete_all
           end
         end
 
@@ -419,7 +419,7 @@ module ActiveRecord #:nodoc:
               self.reset_column_information
             end
 
-            return if connection.table_exists?(versioned_table_name)
+            return if connection.data_source_exists?(versioned_table_name)
 
             self.connection.create_table(versioned_table_name, create_table_options) do |t|
               t.column versioned_foreign_key, :integer

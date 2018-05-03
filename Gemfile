@@ -1,7 +1,11 @@
 source 'http://rubygems.org'
 
 group :development do
-  gem 'rails',        '>=3.0.9'
-  gem 'sqlite3-ruby'
-  gem 'mysql'
+  platform :jruby do
+    gem 'activerecord-jdbcsqlite3-adapter'
+    gem 'activerecord-jdbcmysql-adapter'
+    gem 'pry'
+  end
+
+  gem 'rails', '5.0.6'
 end

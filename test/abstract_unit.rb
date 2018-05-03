@@ -7,7 +7,6 @@ require 'test/unit'
 require 'active_support'
 require 'active_record'
 require 'active_record/fixtures'
-require 'active_record/test_case'
 
 begin
   require 'ruby-debug'
@@ -38,10 +37,10 @@ class ActiveSupport::TestCase #:nodoc:
   self.fixture_path = File.dirname(__FILE__) + "/fixtures/"
   
   # Turn off transactional fixtures if you're working with MyISAM tables in MySQL
-  self.use_transactional_fixtures = true
+  self.use_transactional_tests = true
 
   # Instantiated fixtures are slow, but give you @david where you otherwise would need people(:david)
-  self.use_instantiated_fixtures  = false
+  self.use_transactional_tests  = false
 
   # Add more helper methods to be used by all tests here...
 end

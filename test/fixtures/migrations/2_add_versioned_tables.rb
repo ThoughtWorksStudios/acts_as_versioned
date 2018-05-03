@@ -1,4 +1,4 @@
-class AddVersionedTables < ActiveRecord::Migration
+class AddVersionedTables < ActiveRecord::Migration[5.0]
   def self.up
     create_table("things") do |t|
       t.column :title, :text

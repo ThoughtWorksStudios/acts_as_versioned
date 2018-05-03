@@ -1,6 +1,8 @@
 require File.join(File.dirname(__FILE__), 'abstract_unit')
 require File.join(File.dirname(__FILE__), 'fixtures/page')
 require File.join(File.dirname(__FILE__), 'fixtures/widget')
+require File.join(File.dirname(__FILE__), 'fixtures/landmark')
+require 'minitest/autorun'
 
 class VersionedTest < ActiveSupport::TestCase
   fixtures :pages, :page_versions, :locked_pages, :locked_pages_revisions, :authors, :landmarks, :landmark_versions
@@ -238,7 +240,7 @@ class VersionedTest < ActiveSupport::TestCase
   end
 
   def test_find_versions
-    assert_equal 1, locked_pages(:welcome).versions.find(:all, :conditions => ['title LIKE ?', '%weblog%']).size
+    assert_equal 1, locked_pages(:welcome).versions.where('title LIKE ?', '%weblog%').size
   end
 
   def test_find_version
@@ -247,9 +249,9 @@ class VersionedTest < ActiveSupport::TestCase
 
   def test_with_sequence
     assert_equal 'widgets_seq', Widget.versioned_class.sequence_name
-    3.times { Widget.create! :name => 'new widget' }
-    assert_equal 3, Widget.count
-    assert_equal 3, Widget.versioned_class.count
+    3.times { Widget.create! :name => 'new widget1' }
+    assert_equal 3, Widget.where(name: 'new widget1').count
+    assert_equal 3, Widget.versioned_class.where(name: 'new widget1').count
   end
 
   def test_has_many_through
@@ -274,15 +276,14 @@ class VersionedTest < ActiveSupport::TestCase
     association = Widget.reflect_on_association(:versions)
     options = association.options
     assert_equal :nullify, options[:dependent]
-    assert_equal 'version desc', options[:order]
     assert_equal 'widget_id', options[:foreign_key]
 
     widget = Widget.create! :name => 'new widget'
-    assert_equal 1, Widget.count
-    assert_equal 1, Widget.versioned_class.count
+    assert_equal 1, Widget.where(name: 'new widget').count
+    assert_equal 1, Widget.versioned_class.where(name: 'new widget').count
     widget.destroy
-    assert_equal 0, Widget.count
-    assert_equal 1, Widget.versioned_class.count
+    assert_equal 0, Widget.where(name: 'new widget').count
+    assert_equal 1, Widget.versioned_class.where(name: 'new widget').count
   end
 
   def test_versioned_records_should_belong_to_parent

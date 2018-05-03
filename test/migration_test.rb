@@ -1,4 +1,5 @@
 require File.join(File.dirname(__FILE__), 'abstract_unit')
+require 'minitest/autorun'
 
 if ActiveRecord::Base.connection.supports_migrations? 
   class Thing < ActiveRecord::Base
@@ -7,14 +8,14 @@ if ActiveRecord::Base.connection.supports_migrations?
   end
 
   class MigrationTest < ActiveSupport::TestCase
-    self.use_transactional_fixtures = false
+    self.use_transactional_tests = false
     def teardown
       if ActiveRecord::Base.connection.respond_to?(:initialize_schema_information)
         ActiveRecord::Base.connection.initialize_schema_information
         ActiveRecord::Base.connection.update "UPDATE schema_info SET version = 0"
       else
         ActiveRecord::Base.connection.initialize_schema_migrations_table
-        ActiveRecord::Base.connection.assume_migrated_upto_version(0)
+        ActiveRecord::Base.connection.assume_migrated_upto_version(0,File.dirname(__FILE__) + '/fixtures/migrations/')
       end
       
       Thing.connection.drop_table "things" rescue nil
@@ -22,6 +23,7 @@ if ActiveRecord::Base.connection.supports_migrations?
     end
         
     def test_versioned_migration
+      ActiveRecord::Migrator.down(File.dirname(__FILE__) + '/fixtures/migrations/')
       assert_raises(ActiveRecord::StatementInvalid) { Thing.create :title => 'blah blah' }
       # take 'er up
       ActiveRecord::Migrator.up(File.dirname(__FILE__) + '/fixtures/migrations/')
@@ -31,7 +33,7 @@ if ActiveRecord::Base.connection.supports_migrations?
       # check that the price column has remembered its value correctly
       assert_equal t.price,  t.versions.first.price
       assert_equal t.title,  t.versions.first.title
-      assert_equal t[:type], t.versions.first[:type]
+      assert_equal t[:type], t.versions.first[:versioned_type]
       
       # make sure that the precision of the price column has been preserved
       assert_equal 7, Thing::Version.columns.find{|c| c.name == "price"}.precision
