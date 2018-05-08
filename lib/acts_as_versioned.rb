@@ -205,7 +205,8 @@ module ActiveRecord #:nodoc:
         #
         # Create the dynamic versioned model
         #
-        const_set(versioned_class_name, Class.new(defined?(ApplicationRecord) ? ApplicationRecord : ActiveRecord::Base)).class_eval do
+        klass = Class.new((options[:versioned_extend] && options[:versioned_extend].is_a?(Class)) ? options[:versioned_extend] : ActiveRecord::Base)
+        const_set(versioned_class_name, klass).class_eval do
           def self.reloadable?;
             false;
           end
@@ -254,6 +255,7 @@ module ActiveRecord #:nodoc:
                                    :class_name  => "::#{self.to_s}",
                                    :foreign_key => versioned_foreign_key
         versioned_class.send :include, options[:extend] if options[:extend].is_a?(Module)
+        versioned_class.send :include, options[:versioned_extension] if options[:versioned_extension].is_a?(Module)
         versioned_class.sequence_name = version_sequence_name if version_sequence_name
       end
 

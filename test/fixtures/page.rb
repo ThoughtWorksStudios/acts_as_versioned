@@ -41,3 +41,21 @@ end
 class Author < ActiveRecord::Base
   has_many :pages
 end
+
+module SmartVersionExt
+  def smart?
+    true
+  end
+end
+ class SupperClass < ActiveRecord::Base
+
+ end
+
+class PageWithSmartVersion < ActiveRecord::Base
+
+  acts_as_versioned versioned_extension: SmartVersionExt
+end
+
+class CustomizedSupperClass < ActiveRecord::Base
+  acts_as_versioned versioned_extend: SupperClass
+end

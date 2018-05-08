@@ -368,4 +368,17 @@ class VersionedTest < ActiveSupport::TestCase
     end
     assert ActiveRecord::Base.lock_optimistically
   end
+
+  def test_page_with_smart_version_has_smart_versions
+      page_with_smart_version = PageWithSmartVersion.create! :title => 'first title', :body => 'first body'
+
+     assert !page_with_smart_version.respond_to?(:smart?)
+     assert page_with_smart_version.versions.first.smart?
+  end
+
+  def test_customized_supper_class_versions_inherits_from_provided_version_extend_option
+    customized_supper_class = CustomizedSupperClass.create! :title => 'first title', :body => 'first body'
+
+    assert customized_supper_class.versions.first.kind_of?(SupperClass)
+  end
 end

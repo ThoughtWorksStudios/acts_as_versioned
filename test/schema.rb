@@ -79,4 +79,48 @@ ActiveRecord::Schema.define(:version => 0) do
   end
   
   add_index :landmark_versions, [:landmark_id, :version], :unique => true
+
+  create_table :page_with_smart_versions, :force => true do |t|
+    t.column :version, :integer
+    t.column :title, :string, :limit => 255
+    t.column :body, :text
+    t.column :created_on, :datetime
+    t.column :updated_on, :datetime
+    t.column :author_id, :integer
+    t.column :revisor_id, :integer
+  end
+
+  create_table :page_with_smart_version_versions, :force => true do |t|
+    t.column :page_with_smart_version_id, :integer
+    t.column :version, :integer
+    t.column :title, :string, :limit => 255
+    t.column :body, :text
+    t.column :created_on, :datetime
+    t.column :updated_on, :datetime
+    t.column :author_id, :integer
+    t.column :revisor_id, :integer
+  end
+
+
+  create_table :customized_supper_classes, :force => true do |t|
+    t.column :version, :integer
+    t.column :title, :string, :limit => 255
+    t.column :body, :text
+    t.column :created_on, :datetime
+    t.column :updated_on, :datetime
+    t.column :author_id, :integer
+    t.column :revisor_id, :integer
+  end
+
+  create_table :customized_supper_class_versions, :force => true do |t|
+    t.column :customized_supper_class_id, :integer
+    t.column :version, :integer
+    t.column :title, :string, :limit => 255
+    t.column :body, :text
+    t.column :created_on, :datetime
+    t.column :updated_on, :datetime
+    t.column :author_id, :integer
+    t.column :revisor_id, :integer
+  end
+
 end
